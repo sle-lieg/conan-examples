@@ -1,3 +1,11 @@
+# Python env
+my_env
+
+# Private dir
+.cmake
+.vscode
+.vsconan
+
 # Prerequisites
 *.d
 
