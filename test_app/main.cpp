@@ -1,5 +1,5 @@
-#include "foo.h"
-#include "bar.h"
+#include "foo/foo.h"
+#include "bar/bar.h"
 
 int main(void)
 {

@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(testpackage)
 
-option(RUN_CONAN_INSTALL "execute conan install step" OFF)
-
-if(${RUN_CONAN_INSTALL})
-    set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}")
-    set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
-    execute_process(COMMAND conan install ${CMAKE_SOURCE_DIR} -b${CMAKE_CURRENT_BINARY_DIR}) # Execution conan install
-endif()
+# So cmake looks for MyPackageConfig.cmake in current build directory when 'pure' cmake is used (must run conan install
+# manually before)
+set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
 # This syntax is purely informative, cmake does not generate an error if a component is not found, only if
 # MyPackageConfig.cmake is missing or not in

@@ -1,5 +1,5 @@
 from conans import ConanFile
-from conan.tools.cmake import CMake
+from conan.tools.cmake import CMake, cmake_layout
 #   This Cmake require the CMakeToolChain generator to work.
 #   The CMakeToolChain generator generate the CMakePresets.json and conan_toolchain.cmake files, each consumed by the
 #   conan.tools.cmake.CMake helper.
@@ -25,53 +25,33 @@ class MyPackageConan(ConanFile):
         cmake.configure()
         cmake.build()
 
-    # def layout(self):
-    #     # self.folders.package = "MyPackage"
-    #     self.folders.source = "."
-    #     build_type = str(self.settings.build_type).lower()
-    #     self.folders.build = "cmake-build-{}".format(build_type)
-    #     self.folders.generators = self.folders.build
+    def layout(self):
+        cmake_layout(self, src_folder=".")
 
-        # self.cpp.build.includedirs = ["foo/include", "bar/include"]
-        # self.cpp.build.libdirs = ["foo/lib", "bar/lib"]
-        # self.cpp.build.bindirs = ["foo/bin", "bar/bin"]
-        # self.cpp.build.resdirs = ["foo/resources", "bar/resources"]
+        # Source informations (relative to Source path, which is where the conanfile.py is located by default,
+        # so ./conan-examples/multi_lib_single_conanfile here) :
+        #   - So the consumer of the package if in EDITABLE mode knows where the includes are
+        self.cpp.source.components["foo"].includedirs = ["libfoo/include"]
+        self.cpp.source.components["bar"].includedirs = ["libbar/include"]
+        # self.cpp.source.components["bar"].resdirs = ["libbar/resources"] # If your component has resources
 
-        # self.cpp.package.includedirs = ["foo/include", "bar/include"]
-        # self.cpp.package.libdirs = ["foo/lib", "bar/lib"]
-        # self.cpp.package.bindirs = ["foo/bin", "bar/bin"]
-        # self.cpp.package.resdirs = ["foo/resources", "bar/resources"]
+        # Build informations (relative to the Build path, so by default with cmake_layout build/Release or build Debug):
+        #   - So the consumer of the package if in EDITABLE mode knows where the libs are located
+        self.cpp.build.components["foo"].libs = ["foo"]
+        self.cpp.build.components["foo"].libdirs = ["libfoo"]
+        self.cpp.build.components["bar"].libs = ["bar"]
+        self.cpp.build.components["bar"].libdirs = ["libbar"]
+        # self.cpp.source.components["bar"].bindir = ["path_to_bin/"] # If your component was a binary
 
-        # self.cpp.package.components = {
-        #     "foo": {
-        #         "package_folder": "libfsoo",
-        #         "build_folder": "build",
-        #         "source_folder": "src",
-        #         "install_folder": "lib",
-        #     },
-        #     "bar": {
-        #         "toto": "libbar",
-        #         "build_folder": "build",
-        #         "source_folder": "src",
-        #         "install_folder": "lib",
-        #     },
-        # }
+        # package informations: can replace the package_info, and describe the final content of the package
+        # (see package_info below for more informations)
+        # self.cpp.package.components["foo"].includedirs = ["include/foo"] # comment this if you want consumer to include foo/foo.h instead of just foo.h
+        self.cpp.package.components["foo"].libdirs = ["lib/foo"]
+        self.cpp.package.components["foo"].libs = ["foo"]
 
-        # self.cpp.package.components["foo"].includedirs = "include"
-        # self.cpp.package.components["foo"].libdirs = "lib"
-
-        # self.cpp.package.libs = ["foo", "bar"]
-        # self.cpp.package.libdirs = []
-        # self.cpp.package.includedirs = ["foo/include", "bar/include"] # includedirs is already set to this value by
-        #                                            # default, but declared for completion
-
-        # # this information is relative to the source folder
-        # self.cpp.source.includedirs = ["include"]  # maps to ./src/include
-
-        # # this information is relative to the build folder
-        # self.cpp.build.libdirs = ["."]             # maps to ./cmake-build-<build_type>
-        # self.cpp.build.bindirs = ["bin"]           # maps to ./cmake-build-<build_type>/bin
-
+        # self.cpp.package.components["bar"].includedirs = ["include/bar"] # comment this if you want consumer to include bar/bar.h instead of just bar.h
+        self.cpp.package.components["bar"].libdirs = ["lib/bar"]
+        self.cpp.package.components["bar"].libs = ["bar"]
 
     def package(self):
         # libcommon.a and libcommon headers are not packaged since they are only required to build libfoo and libbar,
@@ -89,15 +69,29 @@ class MyPackageConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        # So the consumers must include 'foo/foo.h', and not only foo.h
-        self.cpp_info.includedirs = ["include"]
+        # You can either define package_info for the package and its components in here, or in the layout method.
+        # Package_info is used to tell the consumers of the package where are the different libs, include, resources,
+        # etc inside it, and to set some package properties
 
-        # This allow consumers to require only foo.h
+        # This define how the MyPackage cmake file will be named
+        # (file searched by find_package(<cmake_file_name>Config.cmake) in CMakeLists.txt).
+        self.cpp_info.set_property("cmake_file_name", "MyPackage") # By default it already take the package name
+
+        # Set the package and components target names (to use when doing a target_link_libraries for example)
+        self.cpp_info.set_property("cmake_target_name", "MyPackage::MyPackage") # Default to <package_name>::<package_name>
+        self.cpp_info.components["foo"].set_property("cmake_target_name", "MyPackage::foo")
+        self.cpp_info.components["bar"].set_property("cmake_target_name", "MyPackage::bar")
+
+        ## Set this if you want the consumers to include 'foo/foo.h', and not only foo.h
+        # self.cpp_info.includedirs = ["include"]
+
+        ## Otherwise, this allow consumers to require only foo.h and bar.h
         # self.cpp_info.components["foo"].includedirs = ["include/foo"]
         # self.cpp_info.components["bar"].includedirs = ["include/bar"]
 
-        self.cpp_info.components["foo"].libs = ["foo"]
-        self.cpp_info.components["foo"].libdirs = ["lib/foo"]
+        ## This
+        # self.cpp_info.components["foo"].libs = ["foo"]
+        # self.cpp_info.components["foo"].libdirs = ["lib/foo"]
 
-        self.cpp_info.components["bar"].libs = ["bar"]
-        self.cpp_info.components["bar"].libdirs = ["lib/bar"]
+        # self.cpp_info.components["bar"].libs = ["bar"]
+        # self.cpp_info.components["bar"].libdirs = ["lib/bar"]
