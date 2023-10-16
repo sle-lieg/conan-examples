@@ -4,6 +4,7 @@ from os.path import join
 
 class TestPackageConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
+    # CMakeDeps generator create the *Config.cmake files for the requirements, so we can use find_package in cmakelists
     generators = ["CMakeDeps", "CMakeToolchain"]
     options = {"tested": [True, False], "shared": [True, False], "fPIC": [True, False]}
     default_options = {"tested": True, "shared": True, "fPIC": True}

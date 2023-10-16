@@ -8,6 +8,7 @@ class MyPackageConan(ConanFile):
     name = "MyPackage"
     version = "1.0"
     settings = "os", "compiler", "build_type", "arch"
+    # Only CMakeToolchain generator is required, because this component does not have any requirements
     generators = ["CMakeToolchain"]
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True}
@@ -38,18 +39,18 @@ class MyPackageConan(ConanFile):
         # Build informations (relative to the Build path, so by default with cmake_layout build/Release or build Debug):
         #   - So the consumer of the package if in EDITABLE mode knows where the libs are located
         self.cpp.build.components["foo"].libs = ["foo"]
-        self.cpp.build.components["foo"].libdirs = ["libfoo"]
+        self.cpp.build.components["foo"].libdirs = ["libfoo"]  # so consumer knows the lib foo is in build/Release/libfoo folder
         self.cpp.build.components["bar"].libs = ["bar"]
-        self.cpp.build.components["bar"].libdirs = ["libbar"]
+        self.cpp.build.components["bar"].libdirs = ["libbar"] # so consumer knows the lib foo is in build/Release/libfoo folder
         # self.cpp.source.components["bar"].bindir = ["path_to_bin/"] # If your component was a binary
 
         # package informations: can replace the package_info, and describe the final content of the package
         # (see package_info below for more informations)
-        # self.cpp.package.components["foo"].includedirs = ["include/foo"] # comment this if you want consumer to include foo/foo.h instead of just foo.h
+        self.cpp.package.components["foo"].includedirs = ["include/foo"]
         self.cpp.package.components["foo"].libdirs = ["lib/foo"]
         self.cpp.package.components["foo"].libs = ["foo"]
 
-        # self.cpp.package.components["bar"].includedirs = ["include/bar"] # comment this if you want consumer to include bar/bar.h instead of just bar.h
+        self.cpp.package.components["bar"].includedirs = ["include/bar"]
         self.cpp.package.components["bar"].libdirs = ["lib/bar"]
         self.cpp.package.components["bar"].libs = ["bar"]
 
