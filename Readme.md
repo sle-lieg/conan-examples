@@ -2,6 +2,10 @@
 
 This program has been developped and tested with conan 1.59
 
+The multi_lib_single_conanfile is a package that contains 2 public shared libraries, libfoo.so and libbar.so, and a private static library, libcommon.a, that is used by the 2 others.
+
+The package uses a cmake_layout, and demonstrate how to package a multi-component package, and how to configure its layout so the package is also usable in editable mode.
+
 ## 🛠️ Build the package with conan
 ```bash
 cd multi_lib_single_conanfile
