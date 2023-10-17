@@ -36,7 +36,7 @@ class MyPackageConan(ConanFile):
         self.cpp.source.components["bar"].includedirs = ["libbar/include"]
         # self.cpp.source.components["bar"].resdirs = ["libbar/resources"] # If your component has resources
 
-        # Build informations (relative to the Build path, so by default with cmake_layout build/Release or build Debug):
+        # Build informations (relative to the Build path, so by default with 'cmake_layout' build/Release or build Debug):
         #   - So the consumer of the package if in EDITABLE mode knows where the libs are located
         self.cpp.build.components["foo"].libs = ["foo"]
         self.cpp.build.components["foo"].libdirs = ["libfoo"]  # so consumer knows the lib foo is in build/Release/libfoo folder

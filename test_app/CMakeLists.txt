@@ -1,13 +1,25 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(testpackage)
 
-# So cmake looks for MyPackageConfig.cmake in current build directory when 'pure' cmake is used (must run conan install
-# manually before)
-set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}")
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
+option(RUN_CONAN_INSTALL "Run conan install to get the dependencies when using pure cmake" OFF)
+
+if(${RUN_CONAN_INSTALL})
+    # Set the build type to Release by default
+    if(NOT CMAKE_BUILD_TYPE)
+        set(CMAKE_BUILD_TYPE Release)
+    endif()
+
+    execute_process(COMMAND conan install ${CMAKE_CURRENT_SOURCE_DIR} -if=${CMAKE_CURRENT_BINARY_DIR} -sbuild_type=${CMAKE_BUILD_TYPE}) #-b missing
+
+    # The cmake_layout generate the CMakeToolchain files inside a generators folder, inside build/Release
+    # (or build/Debug) directory by default.
+    # So for cmake to find MyPackageConfig.cmake in the generators folder, include the conan_toolchain.cmake file, which
+    # set CMAKE_PREFIX_PATH and CMAKE_MODULE_PATH to the proper paths, among other usefull variables
+    include("${CMAKE_CURRENT_BINARY_DIR}/generators/conan_toolchain.cmake")
+endif()
 
 # This syntax is purely informative, cmake does not generate an error if a component is not found, only if
-# MyPackageConfig.cmake is missing or not in
+# MyPackageConfig.cmake is missing
 find_package(MyPackage COMPONENTS bar foo donotexist REQUIRED)
 
 # Check if the "foo" component is found
