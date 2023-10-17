@@ -6,7 +6,7 @@ option(RUN_CONAN_INSTALL "execute conan install step" OFF)
 if(${RUN_CONAN_INSTALL})
     set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}")
     set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
-    execute_process(COMMAND conan install ${CMAKE_SOURCE_DIR} -b${CMAKE_CURRENT_BINARY_DIR}) # Execution conan install
+    execute_process(COMMAND conan install ${CMAKE_SOURCE_DIR}) # Execution conan install
 endif()
 
 # This syntax is purely informative, cmake does not generate an error if a component is not found, only if

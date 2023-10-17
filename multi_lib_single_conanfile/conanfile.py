@@ -19,7 +19,7 @@ class MyPackageConan(ConanFile):
     # ├── libbar/
     # ├── libcommon/
     # └── libfoo/
-    exports_sources = "CmakeLists.txt", "libcommon/*", "libfoo/*", "libbar/*"
+    exports_sources = "CMakeLists.txt", "libcommon/*", "libfoo/*", "libbar/*"
 
     def build(self):
         cmake = CMake(self)
@@ -41,7 +41,7 @@ class MyPackageConan(ConanFile):
         self.cpp.build.components["foo"].libs = ["foo"]
         self.cpp.build.components["foo"].libdirs = ["libfoo"]  # so consumer knows the lib foo is in build/Release/libfoo folder
         self.cpp.build.components["bar"].libs = ["bar"]
-        self.cpp.build.components["bar"].libdirs = ["libbar"] # so consumer knows the lib foo is in build/Release/libfoo folder
+        self.cpp.build.components["bar"].libdirs = ["libbar"] # so consumer knows the lib bar is in build/Release/libbar folder
         # self.cpp.source.components["bar"].bindir = ["path_to_bin/"] # If your component was a binary
 
         # package informations: can replace the package_info, and describe the final content of the package
@@ -72,7 +72,8 @@ class MyPackageConan(ConanFile):
     def package_info(self):
         # You can either define package_info for the package and its components in here, or in the layout method.
         # Package_info is used to tell the consumers of the package where are the different libs, include, resources,
-        # etc inside it, and to set some package properties
+        # etc inside it, and to set some package properties. But it does not affect the project tree, it does not create
+        # any folders !!
 
         # This define how the MyPackage cmake file will be named
         # (file searched by find_package(<cmake_file_name>Config.cmake) in CMakeLists.txt).

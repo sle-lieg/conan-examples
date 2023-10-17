@@ -12,7 +12,7 @@ class TestPackageConan(ConanFile):
     version = "1.0"
 
     def requirements(self):
-        self.requires("MyPackage/1.0@exail/test")
+        self.requires("MyPackage/1.0@myChannel/test")
 
     def build(self):
         cmake = CMake(self)
