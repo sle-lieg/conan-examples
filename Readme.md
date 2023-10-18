@@ -6,7 +6,7 @@ The multi_lib_single_conanfile is a package that contains 2 public shared librar
 
 The package uses a cmake_layout, and demonstrate how to package a multi-component package, and how to configure its layout so the package is also usable in editable mode.
 
-## 🛠️ Create a cpnan cache version of myconantools
+## 🛠️ Create a conan cache version of myconantools
 Start by creating in the conan cache the package containing the class that all other packages will inherit from, containing default settings, generator, options, and methods
 ```bash
 cd my_conan_tools
