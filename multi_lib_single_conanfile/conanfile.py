@@ -5,13 +5,11 @@ from conan.tools.cmake import CMake, cmake_layout
 #   conan.tools.cmake.CMake helper.
 
 class MyPackageConan(ConanFile):
+    python_requires = "myconantools/1.0@myUser/myChannel"
+    python_requires_extend = "myconantools.DefaultPackageConan"
+
     name = "MyPackage"
     version = "1.0"
-    settings = "os", "compiler", "build_type", "arch"
-    # Only CMakeToolchain generator is required, because this component does not have any requirements
-    generators = ["CMakeToolchain"]
-    options = {"fPIC": [True, False]}
-    default_options = {"fPIC": True}
 
     # Must export all the file needed to build the different libs. Project tree kept as it is when copied in cache
     # .
@@ -21,13 +19,8 @@ class MyPackageConan(ConanFile):
     # └── libfoo/
     exports_sources = "CMakeLists.txt", "libcommon/*", "libfoo/*", "libbar/*"
 
-    def build(self):
-        cmake = CMake(self)
-        cmake.configure()
-        cmake.build()
-
     def layout(self):
-        cmake_layout(self, src_folder=".")
+        super().layout()
 
         # Source informations (relative to Source path, which is where the conanfile.py is located by default,
         # so ./conan-examples/multi_lib_single_conanfile here) :
